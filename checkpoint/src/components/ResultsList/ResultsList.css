@@ -1,0 +1,12 @@
+.rl-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+.rl-empty {
+  border: 1px dashed #334155; 
+  border-radius: 12px;
+  padding: 14px; 
+  text-align: center; 
+  opacity: .85;
+}

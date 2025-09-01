@@ -1,0 +1,11 @@
+.rl2-empty {
+  border: 1px dashed #334155; 
+  border-radius: 12px;
+  padding: 14px; 
+  text-align: center; 
+  opacity: .85;
+}
+.rl2-col { 
+    display: grid; 
+    gap: 10px; 
+}

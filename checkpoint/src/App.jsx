@@ -1,35 +1,59 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useMemo, useState } from "react";
+import "./app.css";
+import SearchBar from "./components/SearchBar/SearchBar.jsx";
+import ResultsList from "./components/ResultsList/ResultsList.jsx";
+import ReadingList from "./components/ReadingList/ReadingList.jsx";
+import { useBooks } from "./hooks/useBooks.js";
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const { loading, error, results, searchBooks } = useBooks();
+
+  const [reading, setReading] = useState([]);
+
+  const readingKeys = useMemo(
+    () => new Set(reading.map((b) => b.key)),
+    [reading]
+  );
+
+  const addToReading = (book) => {
+    if (!book || readingKeys.has(book.key)) return;
+    setReading((prev) => [
+      ...prev,
+      { ...book, status: "Pendiente", notes: "" },
+    ]);
+  };
+
+  const saveItem = (key, changes) => {
+    setReading((prev) => prev.map(b => (b.key === key ? { ...b, ...changes } : b)));
+  };
+
+  const deleteItem = (key) => {
+    setReading((prev) => prev.filter(b => b.key !== key));
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div className="container">
+      <h1>BookTrack</h1>
+      <p>Busca libros en Open Library y crea tu lista de lectura.</p>
 
-export default App
+      <SearchBar onSearch={searchBooks} disabled={loading} />
+
+      {error && <div className="section" style={{color:"#fecaca"}}>Error: {error}</div>}
+
+      <ResultsList
+        items={results}
+        onAdd={addToReading}
+        adding={loading}
+        readingKeys={readingKeys}
+      />
+
+      <hr />
+
+      <ReadingList
+        items={reading}
+        onSaveItem={saveItem}
+        onDeleteItem={deleteItem}
+      />
+    </div>
+  );
+}
